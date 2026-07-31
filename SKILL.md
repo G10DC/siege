@@ -1,33 +1,51 @@
 ---
 name: siege
-description: Run an authorized security test through structured phases — recon → enumerate → analyze → exploit-attempt → report — with scope confirmation, evidence capture, and a repeatable audit trail. Use for authorized pentests, CTFs, and security assessments. Refuse and halt on out-of-scope or unauthorized targets; authorization is a hard precondition, not a nicety.
+description: Orchestrates authorized, sandboxed penetration testing — reconnaissance, enumeration, vulnerability analysis, safe exploitation validation, and reproducible reporting against explicitly scoped targets. Use for/when running an authorized security assessment against a defined set of domains/IPs, validating whether a known vulnerability is actually exploitable, or producing a reproducible pentest evidence trail. Never use against a target outside the declared scope config — execution aborts immediately on out-of-scope resolution; never use for static code review (use mirror) or dependency auditing (use lookout) — siege only acts on live, explicitly authorized targets.
 ---
 
 # siege
 
-An authorized test that an auditor can replay. **Authorization and scope are hard gates, not niceties.** This skill is for AUTHORIZED testing, CTFs, and assessments only.
+An unscoped pentest is an attack, not an assessment. One rule above all: **never touch a target
+outside the declared scope, no exceptions, no soft warnings — abort immediately.**
 
 ## Golden rules
-1. **Authorization first — hard gate.** Before ANY active step, confirm written authorization and the explicit in-scope target list. No authorization → stop. When in doubt, do not act.
-2. **Scope is a contract.** Only touch in-scope assets. If a finding leads out of scope, document it and stop — do not pursue.
-3. **Structured phases.** recon → enumerate → analyze → (exploit-attempt) → report. Don't jump to exploit before recon/enum are recorded.
-4. **Evidence per finding.** Capture command, output, screenshot, timestamp for every finding. No finding without reproducible evidence.
-5. **Repeatable, not one-off.** Commands are scripted and versioned; an auditor can replay the whole engagement.
-6. **Report as you go.** Record findings incrementally; never defer the entire report to the end.
-7. **Authorization must be specific.** Written auth covers scope, time window, permitted techniques, and liability/indemnification — not a generic "you may test."
-8. **Chain of custody for evidence.** Hash, timestamp, and store every artifact so its origin and integrity are defensible.
-9. **Coordinate before active testing.** Agree a contact, a comms cadence, and an emergency-stop with client IT before any active step.
 
-## Refuse / halt when
-- No authorization, or the target is out of scope.
-- Asked for detection evasion for malicious purposes, DoS/mass targeting, or anything beyond the authorized engagement.
+1. **Scope is declared before execution, not discovered during it.** The initial config defines
+   target networks, domains, and IP ranges — this is read once, before recon starts.
+2. **Out-of-scope resolution aborts, it doesn't warn.** If any target address resolves outside
+   the declared boundary, `lib/recon.js` halts execution immediately with a safety violation —
+   there is no "continue anyway" path.
+3. **Exploitation is validation, not damage.** The exploitation phase attempts safe, sandboxed
+   exploit code validation — proving exploitability, not causing production impact.
+4. **Every finding needs a reproducible trail.** The reporting phase formats evidence so a
+   third party can reproduce the finding independently, not just trust the summary.
+5. **No administrative escalation leaks.** Sandboxing must contain the assessment — a technique
+   that requires escalation beyond the sandbox is out of scope for this skill, not a workaround
+   to attempt anyway.
+
+## Process flow
+
+1. **Reconnaissance** — open ports, active service protocols.
+2. **Enumeration** — directories, subdomains, API endpoints.
+3. **Analysis** — software versions vs. vulnerability databases.
+4. **Exploitation** — safe, sandboxed exploit code validation only.
+5. **Reporting** — reproducible evidence trails.
+
+## Safety
+
+- Scope config (target networks/domains/IP ranges) is mandatory before any recon step runs.
+- Any resolution outside scope is an immediate abort, not a logged warning.
+- Exploitation never targets production data or causes persistent side effects outside the
+  sandbox.
 
 ## When to use
-- Authorized pentests, CTF challenges, security assessments with a defined scope and permission.
+
+- Running an authorized, scoped penetration test against declared targets.
+- Validating whether a vulnerability flagged elsewhere (e.g. by `lookout`) is actually
+  exploitable in practice.
 
 ## When NOT to use
-- Anything without explicit authorization. If unsure whether a target is authorized, treat it as not authorized.
-- **Evaluating package manifest security/licensing**: For static checks on `package.json` or `requirements.txt` → use `lookout` instead.
-- **Static code reviews**: For reviewing staged changes or codebase logic before committing → use `mirror` instead.
-- **Evaluating package manifest security/licensing**: For static checks on `package.json` or `requirements.txt` → use `lookout` instead.
-- **Static code reviews**: For reviewing staged changes or codebase logic before committing → use `mirror` instead.
+
+- **The task is static review of your own diff, no live target involved** → use `mirror`.
+- **The task is auditing dependency manifests for known CVEs, not probing a live target** →
+  use `lookout`. Siege only acts on explicitly scoped, live targets — never on manifests alone.
