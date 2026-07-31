@@ -27,3 +27,7 @@ An authorized test that an auditor can replay. **Authorization and scope are har
 
 ## When NOT to use
 - Anything without explicit authorization. If unsure whether a target is authorized, treat it as not authorized.
+- **Evaluating package manifest security/licensing**: For static checks on `package.json` or `requirements.txt` → use `lookout` instead.
+- **Static code reviews**: For reviewing staged changes or codebase logic before committing → use `mirror` instead.
+- **Evaluating package manifest security/licensing**: For static checks on `package.json` or `requirements.txt` → use `lookout` instead.
+- **Static code reviews**: For reviewing staged changes or codebase logic before committing → use `mirror` instead.
