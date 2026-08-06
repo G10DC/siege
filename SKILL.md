@@ -45,21 +45,17 @@ outside the declared scope, no exceptions, no soft warnings — abort immediatel
   exploitable in practice.
 
 ## When NOT to use
-<<<<<<< HEAD
 
 - **The task is static review of your own diff, no live target involved** → use `mirror`.
 - **The task is auditing dependency manifests for known CVEs, not probing a live target** →
   use `lookout`. Siege only acts on explicitly scoped, live targets — never on manifests alone.
-=======
-- Anything without explicit authorization. If unsure whether a target is authorized, treat it as not authorized.
-
+- **Anything without explicit authorization**. If unsure whether a target is authorized, treat it as not authorized.
 
 ---
 
-## ⚡ Spark Breakthrough Enhancement
+## Spark Breakthrough Enhancement
 
 - **Feature**: **Automated Red-Team Security Assessment**
 - **Description**: Generates repeatable audit trails for security testing.
 - **Synergy**: Integrated with `sentinel` (firewall) & `keel` (audit log).
 - **Framework**: Applied via the `spark` 4-Lens Lateral Ideation Engine.
->>>>>>> 42812a8 (feat(spark): integrate spark breakthrough enhancements into siege)
