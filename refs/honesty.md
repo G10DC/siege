@@ -1,6 +1,6 @@
 # Siege Authorized Pentesting Honesty Bounds
 
-The honesty layer is the operational expression of the **G10DC Trellis Standard**: **the processing engine reasons over verified evidence with stated confidence, never hallucinates capabilities or impact.**
+The honesty layer is the operational expression of the **G10DC Trellis Standard**: **the LLM reasons over verified evidence with stated confidence, never hallucinates capabilities or impact.**
 
 ## Domain & Scope
 **Domain**: Authorized Penetration Testing & Scope Verification

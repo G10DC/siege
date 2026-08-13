@@ -1,6 +1,7 @@
 ---
 name: siege
-description: Orchestrates authorized, sandboxed penetration testing — reconnaissance, enumeration, vulnerability analysis, safe exploitation validation, and reproducible reporting against explicitly scoped targets. Use for/when running an authorized security assessment against a defined set of domains/IPs, validating whether a known vulnerability is actually exploitable, or producing a reproducible pentest evidence trail. Never use against a target outside the declared scope config — execution aborts immediately on out-of-scope resolution; never use for static code review (use mirror) or dependency auditing (use lookout) — siege only acts on live, explicitly authorized targets.
+status: implemented
+description: Orchestrates authorized penetration testing — recon, enumeration, vulnerability analysis, safe exploitation validation, and reproducible reporting against explicitly scoped targets. The scope guard is exact-string-match only (no CIDR, no DNS resolution). Use for an authorized security assessment against declared domains/IPs. Never use against a target outside the declared scope; never use for static code review (use mirror) or dependency auditing (use lookout).
 ---
 
 # siege
@@ -11,10 +12,11 @@ outside the declared scope, no exceptions, no soft warnings — abort immediatel
 ## Golden rules
 
 1. **Scope is declared before execution, not discovered during it.** The initial config defines
-   target networks, domains, and IP ranges — this is read once, before recon starts.
-2. **Out-of-scope resolution aborts, it doesn't warn.** If any target address resolves outside
-   the declared boundary, `lib/recon.js` halts execution immediately with a safety violation —
-   there is no "continue anyway" path.
+   an exact allowlist of domain names and IP address strings — read once, before recon starts.
+   Exact-match only, no CIDR/DNS (`refs/scope-guard.md` for the specifics and how to work with it).
+2. **Anything not an exact allowlist match aborts, it doesn't warn.** If a target string is not
+   found verbatim in the allowlist, `lib/recon.js` halts execution immediately with a safety
+   violation — there is no "continue anyway" path.
 3. **Exploitation is validation, not damage.** The exploitation phase attempts safe, sandboxed
    exploit code validation — proving exploitability, not causing production impact.
 4. **Every finding needs a reproducible trail.** The reporting phase formats evidence so a
@@ -24,19 +26,15 @@ outside the declared scope, no exceptions, no soft warnings — abort immediatel
    to attempt anyway.
 
 ## Process flow
-
-1. **Reconnaissance** — open ports, active service protocols.
-2. **Enumeration** — directories, subdomains, API endpoints.
-3. **Analysis** — software versions vs. vulnerability databases.
-4. **Exploitation** — safe, sandboxed exploit code validation only.
-5. **Reporting** — reproducible evidence trails.
+Recon (ports/services) → Enumeration (dirs/subdomains/endpoints) → Analysis (versions vs. CVE
+databases) → Exploitation (sandboxed validation only) → Reporting (reproducible evidence).
 
 ## Safety
 
-- Scope config (target networks/domains/IP ranges) is mandatory before any recon step runs.
-- Any resolution outside scope is an immediate abort, not a logged warning.
-- Exploitation never targets production data or causes persistent side effects outside the
-  sandbox.
+- Scope config (an exact allowlist of domain/IP strings) is mandatory before any recon step runs.
+- Any target not an exact, case-insensitive match against that allowlist is an immediate abort,
+  not a logged warning. See `refs/scope-guard.md` for the guard's exact limitations.
+- Exploitation never targets production data or causes persistent side effects outside the sandbox.
 
 ## When to use
 
@@ -50,12 +48,3 @@ outside the declared scope, no exceptions, no soft warnings — abort immediatel
 - **The task is auditing dependency manifests for known CVEs, not probing a live target** →
   use `lookout`. Siege only acts on explicitly scoped, live targets — never on manifests alone.
 - **Anything without explicit authorization**. If unsure whether a target is authorized, treat it as not authorized.
-
----
-
-## Spark Breakthrough Enhancement
-
-- **Feature**: **Automated Red-Team Security Assessment**
-- **Description**: Generates repeatable audit trails for security testing.
-- **Synergy**: Integrated with `sentinel` (firewall) & `keel` (audit log).
-- **Framework**: Applied via the `spark` 4-Lens Lateral Ideation Engine.
